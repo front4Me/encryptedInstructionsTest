@@ -1,19 +1,55 @@
 <body>
   
   <div class="card text-center position-absolute top-50 start-50 translate-middle">
+    <div class="card-header">
+
+      <!-- tabs -->
+      <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist" >
+          <button class="nav-link active" id="nav-instruction-tab" data-bs-toggle="tab" data-bs-target="#nav-instruction" type="button" role="tab" aria-controls="nav-instruction" aria-selected="true" (click)="resetContent()">Instrucciones Encriptadas</button>
+          <button class="nav-link" id="nav-player-tab" data-bs-toggle="tab" data-bs-target="#nav-player" type="button" role="tab" aria-controls="nav-player" aria-selected="false" (click)="resetContent()">Jugador Ganador</button>
+        </div>
+      </nav>
+      <!-- tabs -->
+
+    </div>
+
     <div class="card-body">
-      <div class="mb-3">
-        <label for="area1" class="form-label">Enter 4 lines to decode</label>
-        <textarea id="area1" cols="10" rows="10" class="form-control" #textArea></textarea>
-        <button class="btn btn-primary" (click)="separateStringLines(textArea.value)">Decode text</button>
-      </div>
-      <label for="file1" class="form-label">Or </label>
-      <div class="mb-5 text-center">
-        <input type="file" id="file1" (change)="onFileInputChange($event)">
-      </div>
-      <div class="mb-3">
-        <label for="area2" class="form-label">Respuesta</label>
-        <textarea id="area2" cols="10" rows="3" class="form-control" [(ngModel)]="response" disabled></textarea>
+      <div class="tab-content" id="nav-tabContent">
+        <!-- first tab content -->
+        <div class="tab-pane fade show active" id="nav-instruction" role="tabpanel" aria-labelledby="nav-instruction-tab" tabindex="0">
+          <div class="mb-3">
+            <label for="area1" class="form-label">Escribe 4 lineas para descifrar</label>
+            <textarea id="area1" cols="10" rows="10" class="form-control" #textArea></textarea>
+            <button class="btn btn-primary" (click)="separateStringLines(textArea.value)">Descifrar</button>
+          </div>
+          <label for="file1" class="form-label">O </label>
+          <div class="mb-5 text-center">
+            <input type="file" id="file1" #file1 (change)="onFileInputChange($event, 'instruction')">
+          </div>
+          <div class="mb-3">
+            <label for="area2" class="form-label">Respuesta</label>
+            <textarea id="area2" cols="10" rows="3" class="form-control" [(ngModel)]="response" disabled></textarea>
+          </div>
+        </div>
+
+        <!-- second tab content -->
+        <div class="tab-pane fade" id="nav-player" role="tabpanel" aria-labelledby="nav-player-tab" tabindex="0">
+          <div class="mb-3">
+            <label for="area3" class="form-label">Escribe el marcador</label>
+            <textarea id="area3" cols="10" rows="10" class="form-control" #textArea2></textarea>
+            <button class="btn btn-primary" (click)="processGameData(textArea2.value)">Encontrar ganador</button>
+          </div>
+          <label for="file2" class="form-label">O </label>
+          <div class="mb-5 text-center">
+            <input type="file" id="file2" #file2 (change)="onFileInputChange($event, 'player')">
+          </div>
+          <div class="mb-3">
+            <label for="area4" class="form-label">Respuesta</label>
+            <textarea id="area4" cols="10" rows="3" class="form-control" [(ngModel)]="response" disabled></textarea>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

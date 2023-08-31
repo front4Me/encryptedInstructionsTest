@@ -41,4 +41,12 @@ describe('AppComponent', () => {
     app.separateStringLines(fileContent);
     expect(app.response).toContain('SI\n');
   });
+
+  it('should handle number correctly', async () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    const fileContent = '5\n140 82\n89 134\n90 110\n112 106\n88 90';
+    await app.processGameData(fileContent);
+    expect(app.response).toBe('1 58');
+  });
 });
