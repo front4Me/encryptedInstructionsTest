@@ -27,7 +27,8 @@ export class AppComponent {
 
   separateStringLines(text: string) {
     let lines = text.split("\n");
-    let [M1, M2, N] = lines[0].split(' ').map(Number);
+    //could use this to compare lenght, don't need them at the moment...
+    // let [M1, M2, N] = lines[0].split(' ').map(Number);
     let cleanCode = lines[3].replace(/(.)\1+/g, '$1');
     this.response = cleanCode.includes(lines[1]) ? 'SI\n' : 'NO\n';
     this.response = cleanCode.includes(lines[2]) ? this.response + 'SI' : this.response + 'NO\n';
