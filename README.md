@@ -1,6 +1,6 @@
 # CandidatAstraZeneca
 
-This is a basic algorithm project with two excercise they accept txt file or has a text area to enter the coded text.
+This is a basic algorithm project with two exercise, it accept txt file or has a text area to enter the coded text.
 
 ## Getting Started
 
