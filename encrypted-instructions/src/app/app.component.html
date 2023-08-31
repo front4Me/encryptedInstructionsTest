@@ -1,16 +1,20 @@
 <body>
   
-  <form>
-    <div class="card text-center position-absolute top-50 start-50 translate-middle">
-      <div class="card-body">
-        <div class="mb-3">
-          <label for="area1" class="form-label">Ingresa el texto</label>
-          <textarea id="area1" cols="10" rows="10" class="form-control"></textarea>
-        </div>
-        <div class="mb-3">
-          
-        </div>
+  <div class="card text-center position-absolute top-50 start-50 translate-middle">
+    <div class="card-body">
+      <div class="mb-3">
+        <label for="area1" class="form-label">Enter 4 lines to decode</label>
+        <textarea id="area1" cols="10" rows="10" class="form-control" #textArea></textarea>
+        <button class="btn btn-primary" (click)="separateStringLines(textArea.value)">Decode text</button>
+      </div>
+      <label for="file1" class="form-label">Or </label>
+      <div class="mb-5 text-center">
+        <input type="file" id="file1" (change)="onFileInputChange($event)">
+      </div>
+      <div class="mb-3">
+        <label for="area2" class="form-label">Respuesta</label>
+        <textarea id="area2" cols="10" rows="3" class="form-control" [(ngModel)]="response" disabled></textarea>
       </div>
     </div>
-  </form>
+  </div>
 </body>

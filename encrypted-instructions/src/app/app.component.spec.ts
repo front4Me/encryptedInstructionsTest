@@ -1,12 +1,24 @@
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
+import { FileReaderService } from './file-reader.service';
 
 describe('AppComponent', () => {
+  const fileServiceStub = {
+    readTextFile(file: any) {
+      return '11 15 38\nCeseAlFuego\nCorranACubierto\nXXcaaamakkCCessseAAllFueeegooDLLKmmNNN'
+    }
+  }
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+      teardown: { destroyAfterEach: true },
       declarations: [
         AppComponent
       ],
+      schemas: [NO_ERRORS_SCHEMA],
+      providers: [
+        {porvide: FileReaderService, useValue: fileServiceStub}
+      ]
     }).compileComponents();
   });
 
@@ -22,10 +34,11 @@ describe('AppComponent', () => {
     expect(app.title).toEqual('encrypted-instructions');
   });
 
-  it('should render title', () => {
+  it('should handle text input change correctly', async () => {
     const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.content span')?.textContent).toContain('encrypted-instructions app is running!');
+    const app = fixture.componentInstance;
+    const fileContent = '11 15 38\nCeseAlFuego\nCorranACubierto\nXXcaaamakkCCessseAAllFueeegooDLLKmmNNN';
+    app.separateStringLines(fileContent);
+    expect(app.response).toContain('SI\n');
   });
 });
