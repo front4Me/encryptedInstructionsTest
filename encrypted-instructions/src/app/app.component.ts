@@ -107,18 +107,26 @@ export class AppComponent {
   }
 
   async processGameData(text: string) {
+    this.resetContent();
     let p1: any[] = [];
     let p2: any[] = [];
     let lines = text.trim().split("\n");
     let rounds = parseInt(lines[0]);
+    let isnum = /^\d+$/.test(lines[0]);
+    if(!isnum){
+      this.errorFound = true;
+      this.errorMessage = 'Error en rondas, contiene caracter incorrecto.';
+      return;
+    }
     if(this.validatePlayersConditions(rounds,lines)) {
       this.errorFound = true;
       return;
     }
     await Promise.all(lines.slice(1, rounds + 1).map(async (line) => {
         let player = line.split(' ').map(Number);
+        let isnum = /^\d+$/.test(line);
         let difference = Math.abs(player[0] - player[1]);
-        if(difference % 1 != 0) {
+        if(difference % 1 != 0 || !isnum) {
           this.errorFound = true;
           this.errorMessage = 'Existe un número que no es entero.';
         }
@@ -135,7 +143,7 @@ export class AppComponent {
 
     const resultWithMaxDifference = this.chooseWinner(p1, p2);
     if (!resultWithMaxDifference) {
-      this.errorMessage = 'No existe empate';
+      this.errorMessage = 'Error en caracteres o empate';
       this.errorFound = true;
       return;
     }
