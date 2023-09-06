@@ -145,7 +145,7 @@ export class AppComponent {
     player2.sort((a,b) => {return b.dif - a.dif});
     let chosenArray = null;
     let i = 0;
-    if(player1[0].dif == player1[0].dif) {
+    if(player1[0].dif == player2[0].dif) {
       this.errorMessage = 'Las ventajas más grandes son iguales, por lo que el ganador se escogerá con las subsecuentes.';
       this.errorFound = true;
     }
