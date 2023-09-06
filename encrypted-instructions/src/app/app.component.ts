@@ -118,18 +118,30 @@ export class AppComponent {
     await Promise.all(lines.slice(1, rounds + 1).map(async (line) => {
         let player = line.split(' ').map(Number);
         let difference = Math.abs(player[0] - player[1]);
+        if(difference % 1 != 0) {
+          this.errorFound = true;
+          this.errorMessage = 'Existe un número que no es entero.';
+        }
         if(player[0] > player[1]) {
           p1.push({text: `1 ${difference}`, dif: difference})
          } else {
           p2.push({text: `2 ${difference}`, dif: difference})
         }
-        
+        if(difference == 0) {
+          this.errorFound = true;
+          this.errorMessage = 'Una o más rondas tienen de ventaja 0.'
+        }
     }));
 
     const resultWithMaxDifference = this.chooseWinner(p1, p2);
     if (!resultWithMaxDifference) {
       this.errorMessage = 'No existe empate';
       this.errorFound = true;
+      return;
+    }
+    if(resultWithMaxDifference[0].dif % 1 != 0) {
+      this.errorFound = true;
+      this.errorMessage = 'La mayor ventaja no es entero.';
       return;
     }
     this.response = resultWithMaxDifference[0].text
