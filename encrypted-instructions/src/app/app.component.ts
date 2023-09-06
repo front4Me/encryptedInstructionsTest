@@ -19,6 +19,12 @@ export class AppComponent {
   async onFileInputChange(event: Event, type: string = 'instruction') {
     const target = event.target as HTMLInputElement;
     const file = target.files?.[0];
+    if(file?.type != 'text/plain'){
+      this.errorFound = true;
+      this.errorMessage = 'El tipo de archivo es invalido';
+      return;
+    }
+    
 
     if (file) {
       try {
@@ -45,16 +51,22 @@ export class AppComponent {
       this.errorFound = true;
       return;
     }
-    this.response = cleanCode.includes(lines[1]) ? 'SI\nNO' : cleanCode.includes(lines[2]) ? 'NO\nSI' : 'NO\nNO';
-    this.downloadTxtFile('codigo_encriptado');
+    this.response = cleanCode.includes(lines[1]) ? cleanCode.includes(lines[2]) ? this.twoCodesInLine() : 'SI\nNO' : cleanCode.includes(lines[2]) ? 'NO\nSI' : 'NO\nNO';
+    if(!this.errorFound){
+      this.downloadTxtFile('codigo_encriptado');
+    }
+  }
+
+  twoCodesInLine() {
+    this.errorFound = true;
+    this.errorMessage = 'No puede tener dos instrucciones el mensaje.'
+    return 'Error';
   }
 
   validateSecretCode(m1: number, m2: number, n: number, line: string[]) {
     //we can check also if the line is same lenght as m1, m2 and n
     let pattern = /^[a-zA-Z0-9]+$/;
-    let instructionPattern = /(.)\1+/g
-    console.log(line[1].length);
-    
+    let instructionPattern = /(.)\1+/g;
     if(m1 <= 1 || m1 >= 51) {
       this.errorMessage = 'La instrucción 1 tiene que estar entre 2 y 50 caracteres';
       return true;
@@ -95,7 +107,8 @@ export class AppComponent {
   }
 
   async processGameData(text: string) {
-    let results: any[] = [];
+    let p1: any[] = [];
+    let p2: any[] = [];
     let lines = text.trim().split("\n");
     let rounds = parseInt(lines[0]);
     if(this.validatePlayersConditions(rounds,lines)) {
@@ -104,20 +117,56 @@ export class AppComponent {
     }
     await Promise.all(lines.slice(1, rounds + 1).map(async (line) => {
         let player = line.split(' ').map(Number);
-        let winner = player[0] > player[1] ? 1 : 2;
         let difference = Math.abs(player[0] - player[1]);
-        results.push({text: `${winner} ${difference}`, dif: difference});
+        if(player[0] > player[1]) {
+          p1.push({text: `1 ${difference}`, dif: difference})
+         } else {
+          p2.push({text: `2 ${difference}`, dif: difference})
+        }
+        
     }));
-    const resultWithMaxDifference = results.reduce((maxResult, currentResult) => {
+
+    const resultWithMaxDifference = this.chooseWinner(p1, p2);
+    if (!resultWithMaxDifference) {
+      this.errorMessage = 'No existe empate';
+      this.errorFound = true;
+      return;
+    }
+    this.response = resultWithMaxDifference[0].text
+    /* const resultWithMaxDifference = results.reduce((maxResult, currentResult) => {
       return currentResult.dif > maxResult.dif ? currentResult : maxResult;
-  });
-    this.response = resultWithMaxDifference.text;
+    });
+    this.response = resultWithMaxDifference.text; */
     this.downloadTxtFile('mejor_jugador');
+  }
+  //this function is for selecting the best player, in case there is a tie
+  chooseWinner(player1: any[], player2: any[]) {
+    player1.sort((a,b) => {return b.dif - a.dif});
+    player2.sort((a,b) => {return b.dif - a.dif});
+    let chosenArray = null;
+    let i = 0;
+    if(player1[0].dif == player1[0].dif) {
+      this.errorMessage = 'Las ventajas más grandes son iguales, por lo que el ganador se escogerá con las subsecuentes.';
+      this.errorFound = true;
+    }
+    while (i < player1.length && i < player2.length && !chosenArray) {
+      if (player1[i].dif > player2[i].dif) {
+          chosenArray = player1;
+      } else if (player2[i].dif > player1[i].dif) {
+          chosenArray = player2;
+      }
+      i++;
+    }
+    return chosenArray;
   }
 
   validatePlayersConditions(rounds: number,lines: string[]) {
     if(rounds>=10001) {
       this.errorMessage = 'Son mas de 10,000 rondas';
+      return true;
+    }
+    if(rounds<=0) {
+      this.errorMessage = 'El número de rondas es incorrecto';
       return true;
     }
     if(rounds!=(lines.length-1)) {
