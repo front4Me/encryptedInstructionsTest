@@ -108,11 +108,12 @@ export class AppComponent {
 
   async processGameData(text: string) {
     this.resetContent();
-    let p1: any[] = [];
-    let p2: any[] = [];
+    let results: any[] = [];
     let lines = text.trim().split("\n");
     let rounds = parseInt(lines[0]);
     let isnum = /^\d+$/.test(lines[0]);
+    let player1Score = 0;
+    let player2Score = 0;
     if(!isnum){
       this.errorFound = true;
       this.errorMessage = 'Error en rondas, contiene caracter incorrecto.';
@@ -125,59 +126,22 @@ export class AppComponent {
     await Promise.all(lines.slice(1, rounds + 1).map(async (line) => {
         let player = line.split(' ').map(Number);
         let isnum = /^\d+$/.test(line);
-        let difference = Math.abs(player[0] - player[1]);
+        player1Score += player[0];
+        player2Score += player[1];
+        let difference = Math.abs(player1Score - player2Score);
         if(difference % 1 != 0 || !isnum) {
           this.errorFound = true;
           this.errorMessage = 'Existe un número que no es entero.';
         }
-        if(player[0] > player[1]) {
-          p1.push({text: `1 ${difference}`, dif: difference})
-         } else {
-          p2.push({text: `2 ${difference}`, dif: difference})
-        }
-        if(difference == 0) {
-          this.errorFound = true;
-          this.errorMessage = 'Una o más rondas tienen de ventaja 0.'
-        }
+        let winner = player1Score > player2Score ? 1 : 2;
+        results.push({text: `${winner} ${difference}`, dif: difference});
     }));
 
-    const resultWithMaxDifference = this.chooseWinner(p1, p2);
-    if (!resultWithMaxDifference) {
-      this.errorMessage = 'Error en caracteres o empate';
-      this.errorFound = true;
-      return;
-    }
-    if(resultWithMaxDifference[0].dif % 1 != 0) {
-      this.errorFound = true;
-      this.errorMessage = 'La mayor ventaja no es entero.';
-      return;
-    }
-    this.response = resultWithMaxDifference[0].text
-    /* const resultWithMaxDifference = results.reduce((maxResult, currentResult) => {
+    const resultWithMaxDifference = results.reduce((maxResult, currentResult) => {
       return currentResult.dif > maxResult.dif ? currentResult : maxResult;
     });
-    this.response = resultWithMaxDifference.text; */
+    this.response = resultWithMaxDifference.text;
     this.downloadTxtFile('mejor_jugador');
-  }
-  //this function is for selecting the best player, in case there is a tie
-  chooseWinner(player1: any[], player2: any[]) {
-    player1.sort((a,b) => {return b.dif - a.dif});
-    player2.sort((a,b) => {return b.dif - a.dif});
-    let chosenArray = null;
-    let i = 0;
-    if(player1[0].dif == player2[0].dif) {
-      this.errorMessage = 'Las ventajas más grandes son iguales, por lo que el ganador se escogerá con las subsecuentes.';
-      this.errorFound = true;
-    }
-    while (i < player1.length && i < player2.length && !chosenArray) {
-      if (player1[i].dif > player2[i].dif) {
-          chosenArray = player1;
-      } else if (player2[i].dif > player1[i].dif) {
-          chosenArray = player2;
-      }
-      i++;
-    }
-    return chosenArray;
   }
 
   validatePlayersConditions(rounds: number,lines: string[]) {
